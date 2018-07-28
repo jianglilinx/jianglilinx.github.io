@@ -1,13 +1,8 @@
 ---
-title: test
+title: 又一次搭建完成
 date: 2018-04-03 10:13:47
-tags: test
+tags: 随笔
 ---
 
-# Test
-
-## Test Test
-
-### Test
-
-test
+# 又一次搭建完成
+以后会在这里记录学习、生活。
