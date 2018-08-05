@@ -28,7 +28,7 @@
 <meta property="og:site_name" content="iPopker&#39;s Blog">
 <meta property="og:description" content="#OrderBy字符串排序规则和在InnoDB中的性能优化 Order by字符串排序规则对于字符串来讲，排序规则可以在配置文件中my.ini中指定，主要有以下几个种类的排序规则：（1） utf8_general_cs 和 utf8_general_ci （后缀”_cs”或者”_ci”意思是区分大小写和不区分大小写（Case Sensitive &amp;amp; Case Insensitve））（2）">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-08-05T09:56:39.089Z">
+<meta property="og:updated_time" content="2018-08-05T10:13:24.861Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="OrderBy字符串排序规则和在InnoDB中的性能优化">
 <meta name="twitter:description" content="#OrderBy字符串排序规则和在InnoDB中的性能优化 Order by字符串排序规则对于字符串来讲，排序规则可以在配置文件中my.ini中指定，主要有以下几个种类的排序规则：（1） utf8_general_cs 和 utf8_general_ci （后缀”_cs”或者”_ci”意思是区分大小写和不区分大小写（Case Sensitive &amp;amp; Case Insensitve））（2）">
@@ -175,7 +175,7 @@
         </div>
         <div class="post-content" id="post-content" itemprop="postContent">
             <p>#OrderBy字符串排序规则和在InnoDB中的性能优化</p>
-<h2 id="Order-by字符串排序规则"><a href="#Order-by字符串排序规则" class="headerlink" title="Order by字符串排序规则"></a>Order by字符串排序规则</h2><p>对于字符串来讲，排序规则可以在配置文件中my.ini中指定，主要有以下几个种类的排序规则：<br>（1） <strong>utf8_general_cs</strong> 和 <strong>utf8_general_ci</strong> （后缀”_cs”或者”_ci”意思是区分大小写和不区分大小写（Case Sensitive &amp; Case Insensitve））<br>（2） utf8_bin 规定每个字符串用二进制编码存储，区分大小写，可以直接存储二进制的内容<br>默认采取的utf8_general_ci <strong>不区分大小写</strong>，并且是按照<strong>逐位比较</strong>，如果相同再比较下一位的方法；如果想按照int方法排序，可以<strong>order by varchar+0</strong>。</p>
+<h2 id="Order-by字符串排序规则"><a href="#Order-by字符串排序规则" class="headerlink" title="Order by字符串排序规则"></a>Order by字符串排序规则</h2><p>对于字符串来讲，排序规则可以在配置文件中my.ini中指定，主要有以下几个种类的排序规则：<br>（1） <strong>utf8_general_cs</strong> 和 <strong>utf8_general_ci</strong> （后缀”_cs”或者”_ci”意思是区分大小写和不区分大小写（Case Sensitive &amp; Case Insensitve））<br>（2） <strong>utf8_bin</strong> 规定每个字符串用二进制编码存储，区分大小写，可以直接存储二进制的内容<br>默认采取的utf8_general_ci <strong>不区分大小写</strong>，并且是按照<strong>逐位比较</strong>，如果相同再比较下一位的方法；如果想按照int方法排序，可以<strong>order by varchar+0</strong>。</p>
 <h2 id="Order-by性能优化"><a href="#Order-by性能优化" class="headerlink" title="Order by性能优化"></a>Order by性能优化</h2><p>参考 <a href="https://dev.mysql.com/doc/refman/5.7/en/order-by-optimization.html" target="_blank" rel="noopener">MySQL 5.7 Reference Manual::ORDER BY Optimization</a>，假如有(key_part1,key_part2)的索引，在以下两种情况下MySQL会使用索引来避免排序操作：</p>
 <ul>
 <li><p><code>SELECT * FROM t1   ORDER BY key_part1, key_part2;</code><br>如果表项不只是key_part1,key_part2的话，那么MySQL优化器可能（不一定）不会通过索引来排序，因为扫描整个索引并且按照索引去查找出所有的行，花费的时间可能比直接查找出所有行再排序还慢。特别的，如果在InnoDB中，因为其特殊的索引存储结构（见聚簇索引），索引行和主键会存放在索引的B+树中，因此可以通过索引直接返回，极大提升排序速度：<br><code>SELECT pk, key_part1, key_part2 FROM t1   ORDER BY key_part1, key_part2;</code></p>
@@ -191,7 +191,7 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2018-08-05T09:56:39.089Z" itemprop="dateUpdated">2018-08-05 17:56:39</time>
+    最后更新时间：<time datetime="2018-08-05T10:13:24.861Z" itemprop="dateUpdated">2018-08-05 18:13:24</time>
 </span><br>
 
 
