@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://ipopker.com/"/>
-  <updated>2018-08-05T10:13:24.861Z</updated>
+  <updated>2018-08-05T11:51:42.964Z</updated>
   <id>http://ipopker.com/</id>
   
   <author>
@@ -15,6 +15,76 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>分布式一致性协议（1）- 2PC与3PC</title>
+    <link href="http://ipopker.com/2018/08/05/%E5%88%86%E5%B8%83%E5%BC%8F%E4%B8%80%E8%87%B4%E6%80%A7%E5%8D%8F%E8%AE%AE%EF%BC%881%EF%BC%89-2PC%E4%B8%8E3PC/"/>
+    <id>http://ipopker.com/2018/08/05/分布式一致性协议（1）-2PC与3PC/</id>
+    <published>2018-08-05T11:39:05.000Z</published>
+    <updated>2018-08-05T11:51:42.964Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="分布式一致性协议（1）-2PC与3PC"><a href="#分布式一致性协议（1）-2PC与3PC" class="headerlink" title="分布式一致性协议（1）- 2PC与3PC"></a>分布式一致性协议（1）- 2PC与3PC</h1><h3 id="2PC"><a href="#2PC" class="headerlink" title="2PC"></a>2PC</h3><p>2PC（Two-Phase Commit），即二阶段提交，是将事务的提交过程分成两个阶段处理，其流程如下：</p><h4 id="阶段一：提交事务请求（投票阶段）"><a href="#阶段一：提交事务请求（投票阶段）" class="headerlink" title="阶段一：提交事务请求（投票阶段）"></a>阶段一：提交事务请求（投票阶段）</h4><ol><li>事务询问<br>协调者（Coordinator）向所有参与者（participant）发送事务内容，询问是否可以执行事务提交（commit）操作，并开始等待各参与者相应。 </li><li>执行事务<br>各参与者节点执行事务操作，并将Undo和Redo信息记入日志中。 </li><li>各参与者向协调者反馈事务询问的响应。<br>如果各参与者成功执行了事务操作，那么反馈给协调者YES响应，表示事物可以执行；如果参与者没有成功执行事务，就反馈no，表示事务不可执行。<h4 id="阶段二：事务提交"><a href="#阶段二：事务提交" class="headerlink" title="阶段二：事务提交"></a>阶段二：事务提交</h4><strong>执行事务提交</strong><br>假如协调者从所有参与者那里获得的反馈都是YES，那么就会执行事务提交。 </li><li>发送提交请求<br>协调者向所有参与者节点发出Commit请求。 </li><li>事务提交<br>参与者接受到Commit请求后，会正式执行事务提交（Commit）操作，并在完成提交之后释放在整个事务执行期间所占用的事务资源。 </li><li>反馈事务提交结果<br>参与者在完成事务提交之后，向协调者发送Ack信息。 </li><li>完成事务<br>协调者接收到所有参与者反馈的Ack消息后，完成事务。</li></ol><p><strong>中断事务</strong><br>加入任何一个参与者向协调者反馈了No，或者等待超时之后，那么就会中断事务； </p><ol><li>发送回滚请求<br>协调者向所有参与者节点发送Rollback请求。 </li><li>事务回滚<br>参与者接受到Rollback请求后，会利用其在阶段一记录的Undo信息来执行事务回滚操作，并在完成提交之后释放在整个事务执行期间所占用的事务资源。 </li><li>反馈事务回滚结果<br>参与者在完成事务回滚之后，向协调者发送Ack信息。 </li><li>中断事务。<br>协调者接受到所有参与者反馈的Ack消息后，完成事务中断。 </li></ol><h3 id="2PC的局限性"><a href="#2PC的局限性" class="headerlink" title="2PC的局限性"></a>2PC的局限性</h3><ul><li>同步阻塞问题。执行过程中，所有参与节点都是事务阻塞型的。当参与者占有公共资源时，其他第三方节点访问公共资源不得不处于阻塞状态。 </li><li>单点故障。由于协调者的重要性，一旦协调者发生故障。参与者会一直阻塞下去。尤其在第二阶段，协调者发生故障，那么所有的参与者还都处于锁定事务资源的状态中，而无法继续完成事务操作。（如果是协调者挂掉，可以重新选举一个协调者，但是无法解决因为协调者宕机导致的参与者处于阻塞状态的问题） </li><li>数据不一致。在二阶段提交的阶段二中，当协调者向参与者发送commit请求之后，发生了局部网络异常或者在发送commit请求过程中协调者发生了故障，这回导致只有一部分参与者接受到了commit请求。而在这部分参与者接到commit请求之后就会执行commit操作。但是其他部分未接到commit请求的机器则无法执行事务提交。于是整个分布式系统便出现了数据部一致性的现象。 </li><li>二阶段无法解决的问题：协调者再发出commit消息之后宕机，而唯一接收到这条消息的参与者同时也宕机了。那么即使协调者通过选举协议产生了新的协调者，这条事务的状态也是不确定的，没人知道事务是否被已经提交。<figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://s1.ax1x.com/2018/08/05/PDgzVJ.png" alt="2PC" title="">                </div>                <div class="image-caption">2PC</div>            </figure><h3 id="3PC"><a href="#3PC" class="headerlink" title="3PC"></a>3PC</h3>三阶段提交（Three-phase commit），也叫三阶段提交协议（Three-phase commit protocol），是二阶段提交（2PC）的改进版本。<br>与两阶段提交不同的是，三阶段提交有两个改动点。 </li></ul><ol><li>引入超时机制。同时在协调者和参与者中都引入超时机制。 </li><li>在第一阶段和第二阶段中插入一个准备阶段。保证了在最后提交阶段之前各参与节点的状态是一致的。<br>也就是说，除了引入超时机制之外，3PC把2PC的准备阶段再次一分为二，这样三阶段提交就有CanCommit、PreCommit、DoCommit三个阶段。</li></ol><h4 id="阶段一：CanCommit阶段"><a href="#阶段一：CanCommit阶段" class="headerlink" title="阶段一：CanCommit阶段"></a>阶段一：CanCommit阶段</h4><p>3PC的CanCommit阶段其实和2PC的准备阶段很像。协调者向参与者发送commit请求，参与者如果可以提交就返回Yes响应，否则返回No响应。 </p><ol><li>事务询问 协调者向参与者发送CanCommit请求。询问是否可以执行事务提交操作。然后开始等待参与者的响应。 </li><li>响应反馈 参与者接到CanCommit请求之后，正常情况下，如果其自身认为可以顺利执行事务，则返回Yes响应，并进入预备状态。否则反馈No</li></ol><h4 id="阶段二：PreCommit阶段"><a href="#阶段二：PreCommit阶段" class="headerlink" title="阶段二：PreCommit阶段"></a>阶段二：PreCommit阶段</h4><p>协调者根据参与者的反应情况来决定是否可以记性事务的PreCommit操作。根据响应情况，有以下两种可能。</p><p><strong>执行事务预提交</strong><br>假如协调者从所有的参与者获得的反馈都是Yes响应，那么就会执行事务的预执行。 </p><ol><li>发送预提交请求 协调者向参与者发送PreCommit请求，并进入Prepared阶段。 </li><li>事务预提交 参与者接收到PreCommit请求后，会执行事务操作，并将undo和redo信息记录到事务日志中。 </li><li>响应反馈 如果参与者成功的执行了事务操作，则返回ACK响应，同时开始等待最终指令。</li></ol><p><strong>中断事务</strong><br>假如有任何一个参与者向协调者发送了No响应，或者等待超时之后，协调者都没有接到参与者的响应，那么就执行事务的中断。 </p><ol><li>发送中断请求 协调者向所有参与者发送abort请求。 </li><li>中断事务 参与者收到来自协调者的abort请求之后（或超时之后，仍未收到协调者的请求），执行事务的中断。</li></ol><h4 id="阶段三：doCommit阶段"><a href="#阶段三：doCommit阶段" class="headerlink" title="阶段三：doCommit阶段"></a>阶段三：doCommit阶段</h4><p>该阶段进行真正的事务提交，也可以分为以下两种情况。<br><strong>执行提交</strong></p><ol><li>发送提交请求 协调接收到参与者发送的ACK响应，那么他将从预提交状态进入到提交状态。并向所有参与者发送doCommit请求。 </li><li>事务提交 参与者接收到doCommit请求之后，执行正式的事务提交。并在完成事务提交之后释放所有事务资源。 </li><li>响应反馈 事务提交完之后，向协调者发送Ack响应。 </li><li>完成事务 协调者接收到所有参与者的ack响应之后，完成事务。</li></ol><p><strong>中断事务</strong><br>协调者没有接收到参与者发送的ACK响应（可能是接受者发送的不是ACK响应，也可能响应超时），那么就会执行中断事务。 </p><ol><li>发送中断请求 协调者向所有参与者发送abort请求 </li><li>事务回滚 参与者接收到abort请求之后，利用其在阶段二记录的undo信息来执行事务的回滚操作，并在完成回滚之后释放所有的事务资源。 </li><li>反馈结果 参与者完成事务回滚之后，向协调者发送ACK消息 </li><li>中断事务 协调者接收到参与者反馈的ACK消息之后，执行事务的中断。<br>在doCommit阶段，如果参与者无法及时接收到来自协调者的doCommit或者rebort请求时，会在等待超时之后，会继续进行事务的提交。（其实这个应该是基于概率来决定的，当进入第三阶段时，说明参与者在第二阶段已经收到了PreCommit请求，那么协调者产生PreCommit请求的前提条件是他在第二阶段开始之前，收到所有参与者的CanCommit响应都是Yes。（一旦参与者收到了PreCommit，意味他知道大家其实都同意修改了）所以，一句话概括就是，当进入第三阶段时，由于网络超时等原因，虽然参与者没有收到commit或者abort响应，但是他有理由相信：成功提交的几率很大。 ） </li></ol><p><img src="https://s1.ax1x.com/2018/08/05/PD2eVH.png" alt="3PC"></p><h3 id="2PC与3PC的区别"><a href="#2PC与3PC的区别" class="headerlink" title="2PC与3PC的区别"></a>2PC与3PC的区别</h3><p>相对于2PC，3PC主要解决的单点故障问题，并减少阻塞，因为一旦参与者无法及时收到来自协调者的信息之后，他会默认执行commit。而不会一直持有事务资源并处于阻塞状态。但是这种机制也会导致数据一致性问题，因为，由于网络原因，协调者发送的abort响应没有及时被参与者接收到，那么参与者在等待超时之后执行了commit操作。这样就和其他接到abort命令并执行回滚的参与者之间存在数据不一致的情况。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;分布式一致性协议（1）-2PC与3PC&quot;&gt;&lt;a href=&quot;#分布式一致性协议（1）-2PC与3PC&quot; class=&quot;headerlink&quot; title=&quot;分布式一致性协议（1）- 2PC与3PC&quot;&gt;&lt;/a&gt;分布式一致性协议（1）- 2PC与3PC&lt;/h1&gt;&lt;h3
+      
+    
+    </summary>
+    
+    
+      <category term="分布式理论基础" scheme="http://ipopker.com/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>kafka特性设计和实现-翻译自官方文档</title>
+    <link href="http://ipopker.com/2018/08/05/kafka%E7%89%B9%E6%80%A7%E8%AE%BE%E8%AE%A1%E5%92%8C%E5%AE%9E%E7%8E%B0-%E7%BF%BB%E8%AF%91%E8%87%AA%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/"/>
+    <id>http://ipopker.com/2018/08/05/kafka特性设计和实现-翻译自官方文档/</id>
+    <published>2018-08-05T11:22:25.000Z</published>
+    <updated>2018-08-05T11:30:43.040Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="kafka特性设计和实现-翻译自官方文档"><a href="#kafka特性设计和实现-翻译自官方文档" class="headerlink" title="kafka特性设计和实现-翻译自官方文档"></a>kafka特性设计和实现-翻译自官方文档</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>kafka是最初由Linkedin公司开发，使用Scala语言编写，Kafka是一个分布式、分区的、多副本的、多订阅者的日志系统(分布式MQ系统)，它的特性如下：</p><ul><li>通过<strong>O(1)的磁盘数据结构提供消息的持久化</strong>，这种结构对于即使数以TB的消息存储也能够保持长时间的稳定性能。</li><li>高吞吐量：即使是非常普通的硬件kafka也可以支持每秒数十万的消息。</li><li>支持同步和异步复制两种HA</li><li><strong>Consumer客户端pull</strong>，<strong>随机读利用sendfile系统调用实现zero-copy</strong> ,批量拉数据</li><li>消费状态保存在客户端</li><li>消息存储顺序写</li><li>数据迁移、扩容对用户透明</li><li>支持Hadoop并行数据加载。</li><li>支持online和offline的场景。</li><li>持久化：通过将<strong>数据持久化到硬盘</strong>以及<strong>replication</strong>防止数据丢失。</li><li><strong>scale out：无需停机即可扩展机器。</strong></li><li>定期删除机制，支持设定partitions的segment file保留时间。 </li></ul><h2 id="持久性设计与性能优化"><a href="#持久性设计与性能优化" class="headerlink" title="持久性设计与性能优化"></a>持久性设计与性能优化</h2><p>kafka在很大程度上依赖文件系统来存储和缓存消息。为了尽量缩小磁盘与内存带来的性能差异，kafka在设计上采用一些特殊设计提升性能和效率：</p><ul><li>kafka会保持以<strong>顺序的方式</strong>对硬盘进行读写（对于机械硬盘来说，随机读写带来的多余磁头寻道时间让读写速度远远慢于顺序读写）；</li><li>依赖于OS的<strong>page cache（页高速缓冲存储器）</strong>，page cache的大小为一页，通常为4K。在linux读写文件时，它用于缓存文件的逻辑内容，从而加快对磁盘上映像和数据的访问。详情见： <a href="https://blog.csdn.net/xf_xjtu/article/details/46382119" target="_blank" rel="noopener">Linux Page Cache机制</a></li><li><strong>直接在文件上进行读取和添加（append）</strong>，这样的磁盘数据结构比起传统消息队列用的持久化数据结构如b-tree等更快，所有操作达到了O（1），并且读和写并不会互相影响。</li><li>为了减少字节复制，提高效率，kafka采用了<strong>Linux下的sendfile来实现zero-copy</strong>。现代的unix操作系统提供了一个高度优化的代码路径，用于将数据从页面缓存转移到套接字; 在Linux中，这是通过sendfile系统调用完成的。要理解sendfile的影响，了解数据从文件传输到套接字的常见数据路径非常重要：<br>1.操作系统将数据从磁盘读取到内核空间的pagecache中<br>2.应用程序从内核空间读取数据到用户空间缓冲区<br>3.应用程序将数据写回内核空间到套接字缓冲区<br>4.操作系统将数据从套接字缓冲区复制到通过网络发送的NIC缓冲区<br>这显然是低效的，有四个副本和两个系统调用。使用sendfile，通过允许操作系统将数据从pagecache直接发送到网络，可以避免重新复制。所以在这个优化的路径中，只需要最终拷贝到NIC缓冲区。</li><li>很多时候性能瓶颈不在cpu或者磁盘，而在于网络。Kafka以高效的批处理格式支持压缩。一批消息可以压缩在一起并以这种形式发送到服务器。这批消息将以压缩格式写入，并将保持压缩在日志中，只会由消费者解压缩。Kafka支持GZIP，Snappy和LZ4压缩协议。</li></ul><h2 id="生产者-Producer-的负载均衡与数据传输优化"><a href="#生产者-Producer-的负载均衡与数据传输优化" class="headerlink" title="生产者(Producer)的负载均衡与数据传输优化"></a>生产者(Producer)的负载均衡与数据传输优化</h2><h3 id="生产者负载均衡"><a href="#生产者负载均衡" class="headerlink" title="生产者负载均衡"></a>生产者负载均衡</h3><ol><li>producer 端的配置文件中，指定 Kafka 的 broker 信息； </li><li>kafka集群中的任何一个broker，都可以向producer提供metadata信息；<br>这些metadata中包含”集群中存活的servers列表”、”partitions leader列表”等信息(请参看zookeeper中的节点信息)； </li><li>当producer获取到metadata信息之后，producer将会和Topic下所有partition leader保持socket连接； </li><li>消息由producer直接通过socket发送到broker，中间不会经过任何”路由层”；<br>消息被路由到哪个partition上，由producer客户端决定，比如，可以采用”random”、”key-hash”、”轮询”等，如果一个topic中有多个partitions,那么在producer端实现”消息均衡分发”是必要的；</li></ol><h3 id="生产者的数据传输优化"><a href="#生产者的数据传输优化" class="headerlink" title="生产者的数据传输优化"></a>生产者的数据传输优化</h3><p>kafka会试图在内存中积累数据，并在一个请求中发送大批量的数据。批处理可以被配置为累加不超过固定数量的消息并且不超过某个固定的延迟限制（比如64k或10ms）。这允许发送更多字节的累积，并且在服务器上几个较大的I / O操作。这种缓冲是可配置的，并提供了一种机制来折中少量额外的延迟以获得更好的吞吐量。</p><h2 id="消费者-Consumer-对于“推拉”的权衡以及处理已消费信息的优化"><a href="#消费者-Consumer-对于“推拉”的权衡以及处理已消费信息的优化" class="headerlink" title="消费者(Consumer)对于“推拉”的权衡以及处理已消费信息的优化"></a>消费者(Consumer)对于“推拉”的权衡以及处理已消费信息的优化</h2><h3 id="push还是pull？"><a href="#push还是pull？" class="headerlink" title="push还是pull？"></a>push还是pull？</h3><p>消费者是应该从brokers那里pull数据，还是让brokers向消费者那里push数据？这方面，kafka采用了一种更为传统的设计方式，由大多mq共享，数据从生产者推送给brokers，由消费者从brokers那里pull。一些以日志为中心的系统，如Scribe和 Apache Flume，遵循一个非常不同的推送路径，数据被push到下游。这两种方法都有优点和缺点。然而，基于推送的系统难以处理不同的消费者，因为brokers控制数据传输的速度。目标通常是消费者能够以最大可能的速度消费; 不幸的是，在推动系统中，这意味着当消费率低于生产率（本质上是拒绝服务攻击）时，消费者容易垮掉。基于pull的系统具有更好的属性，消费者消费速度只要落后就会在它可以的时候赶上。<br>基于pull的系统的另一个优点是，它可以将数据发送给消费者，基于推送的系统必须选择立即发送数据，或者累积更多的数据，然后在不知道下游消费者是否能够立即处理的情况下发送。如果调整为低延迟，则这将导致一次只发送单个消息，以便传输结束被缓冲，这是浪费的。基于pull的设计修复了这个问题，因为消费者总是将所有可用的消息拉到日志中的当前位置（或达到某个可配置的最大大小）之后。所以可以获得最佳的数据流量而不会引入不必要的延迟<br>但基于pull的系统的缺点是，如果brokers没有数据，消费者可能会不断发送请求来感知数据到达。为了避免这种情况，我们在我们的pull请求中有一些参数，它们允许消费者请求以“长轮询”的方式进行阻塞，等待数据到达（并且可选地等待，直到给定数量的字节可用以确保大的传输大小）。</p><h3 id="已消费的信息处理"><a href="#已消费的信息处理" class="headerlink" title="已消费的信息处理"></a>已消费的信息处理</h3><p>对于大多数mq，当消息被发送给消费者时，brokers要么立即在本地记录，要么等待消费者的确认。这是一个相当直观的选择，实际上对于单个机器服务器来说，不清楚这个数据可以去哪里。由于在许多消息传递系统中用于存储的数据结构规模较小，因此这也是一个实用的选择 - 由于代理知道消耗的是什么，它可以立即删除它，保持较小数据量。<br>kafka处理这个不同。topic被分成一组完全有序的分区，每个分区在任何给定的时间都被每个订阅消费者组中的一个消费者消费。这意味着消费者在每个分区中的位置只是一个整数，即要消耗的下一个消息的偏移量。这使得所消耗的状态非常小，每个分区只有一个数字。这个状态可以定期检查点。这使消息确认的代价非常低。<br>这个方案还有一个好处。消费者可以故意倒回到旧的偏移量并重新使用数据。这违反了队列的共同合同，但是对于许多消费者来说却是一个必不可少的特征。例如，如果消费者代码有一个错误，并且在一些消息被消费之后被发现，则消费者可以在错误修复后重新使用这些消息。</p><h2 id="kafka的信息传递保证"><a href="#kafka的信息传递保证" class="headerlink" title="kafka的信息传递保证"></a>kafka的信息传递保证</h2><p>可能的信息传递保证：</p><ul><li>最多一次 -消息可能会丢失，但永远不会重新发送。</li><li>至少一次 -消息永远不会丢失，但可以重新传递。</li><li>恰恰一次 - 这就是人们真正想要的，每个信息只传递一次。<br>Kafka支持在KafkaStreams中一次交付，并且在Kafka topic之间传输和处理数据时，事务性生产者/消费者通常可用于提供准确一次的交付。其他目的地系统的一次交付通常需要与这些系统合作，但是Kafka提供了实现这种可行的补偿。否则，Kafka默认保证至少一次交付，并允许用户在处理一批消息之前，通过禁用生产者的重试和消费者的抵消来实现至多一次交付。</li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;kafka特性设计和实现-翻译自官方文档&quot;&gt;&lt;a href=&quot;#kafka特性设计和实现-翻译自官方文档&quot; class=&quot;headerlink&quot; title=&quot;kafka特性设计和实现-翻译自官方文档&quot;&gt;&lt;/a&gt;kafka特性设计和实现-翻译自官方文档&lt;/h1&gt;&lt;
+      
+    
+    </summary>
+    
+    
+      <category term="kafka" scheme="http://ipopker.com/tags/kafka/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>分布式事物的CAP/BASE定理</title>
+    <link href="http://ipopker.com/2018/08/05/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9%E7%9A%84CAP-BASE%E5%AE%9A%E7%90%86/"/>
+    <id>http://ipopker.com/2018/08/05/分布式事物的CAP-BASE定理/</id>
+    <published>2018-08-05T11:19:16.000Z</published>
+    <updated>2018-08-05T11:38:18.765Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="分布式事物的CAP-BASE定理"><a href="#分布式事物的CAP-BASE定理" class="headerlink" title="分布式事物的CAP/BASE定理"></a>分布式事物的CAP/BASE定理</h1><blockquote><blockquote><p>在分布式系统中，分布式事物处理与数据一致性成了分布式一同最为关注的焦点，本文是在阅读《从Paxos到Zookeeper：分布式一致性原理与实践》后，对分布式事物一致性的认知记录。</p></blockquote></blockquote><h2 id="分布式事物的CAP-BASE定理-1"><a href="#分布式事物的CAP-BASE定理-1" class="headerlink" title="分布式事物的CAP/BASE定理"></a>分布式事物的CAP/BASE定理</h2><p>对于集中式的事务处理或本地事务处理，ACID（原子性 Atomicity、一致性 Consistency、隔离性 Isolation、持久性 Durability）模型可以保证数据的严格的一致性。但随着分布式事物的出现，传统的ACID模型已经无法胜任在分布式下的一致性保证，所以出现了诸如CAP和BASE这样的分布式系统的理论。</p><h2 id="CAP定理"><a href="#CAP定理" class="headerlink" title="CAP定理"></a>CAP定理</h2><p>CAP理论主要是说：一个分布式系统不可能同时满足一致性（C：Consistency）、可用性（A：Availablity）和分区容错性（P：Partition tolerance）这三个基本需求，最多同时满足其中的两项。</p><h3 id="C：一致性（Consistency）"><a href="#C：一致性（Consistency）" class="headerlink" title="C：一致性（Consistency）"></a>C：一致性（Consistency）</h3><p>在分布式环境中，一致性是指在多个副本之间能否保持一致的特性。在分布式系统中，如果能够做到针对一个数据项的更新操作执行成功后，所有用户都能读取到其最新的值，那么这样的系统就被认为具有强一致性。</p><h3 id="A：可用性（Availability）"><a href="#A：可用性（Availability）" class="headerlink" title="A：可用性（Availability）"></a>A：可用性（Availability）</h3><p>可用性是指系统提供的服务必须一致处于可用的状态，对于用户的每一个操作请求总是能够在有限的时间内返回结果。</p><h3 id="P：分区容错性（Partition-tolerance）"><a href="#P：分区容错性（Partition-tolerance）" class="headerlink" title="P：分区容错性（Partition tolerance）"></a>P：分区容错性（Partition tolerance）</h3><p>分区容错性是指分布式系统遇到任何网络分区故障的时候，仍然需要能够保证对外提供满足一致性和可用性的服务，除非整个网络发生了故障。<br>其中网络分区的意思是，在分布式系统中，不同节点分布在不同的子网络（机房或者异地网络），需要注意的是，组成一个分布式系统的每个节点都可以看成一个特殊的网络分区。</p><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://s1.ax1x.com/2018/08/05/PDg0De.png" alt="CAP理论" title="">                </div>                <div class="image-caption">CAP理论</div>            </figure><br>从CAP定理我们可以看出，一个分布式系统不可能同时满足CAP这三个需求，另外需要明确的是，对于一个分布式系统而言，分区容错性是一个最基本的要求，因为既然是分布式系统，那么分布式系统中的组件必然需要被部署到不同的节点中，否则也就无所谓是一个分布式系统，那么必然会出现子网络。因此分区容错性也就是一个分布式系统必然要面对和解决的问题。因此系统架构主要会根据业务特点在C（一致性）和A（可用性）之间寻求平衡。</p><h2 id="BASE理论"><a href="#BASE理论" class="headerlink" title="BASE理论"></a>BASE理论</h2><p>BASE是Basically Available（基本可用）、Soft state（软状态）和 Eventually consistent（最终一致性）的缩写，BASE是对CAP中一致性和可用性平衡的结果，是基于CAP定理演化而来的，其核心思想是：<br>即使无法做到强一致性（Strong consistency），但每个应用都可以根据自身业务特点，采用适当的方式使系统达到最终一致性（Eventual consistency）。</p><h3 id="BA：基本可用（Basically-Available）"><a href="#BA：基本可用（Basically-Available）" class="headerlink" title="BA：基本可用（Basically Available）"></a>BA：基本可用（Basically Available）</h3><p>基本可用好似指分布式系统出现不可预知故障时，允许损失部分可用性。以下是基本可用的典型例子：</p><ul><li>相应时间上的损失：允许响应时间略微变长；</li><li>功能上的损失：比如电商系统，在平时正常时，消费者可以顺利完成每一笔订单，但在双十一，由于购物激增，未来保证系统稳定性，部分消费者可能被引导到降级页面。<h3 id="S：软状态（Soft-state）"><a href="#S：软状态（Soft-state）" class="headerlink" title="S：软状态（Soft state）"></a>S：软状态（Soft state）</h3>与硬状态相对，指允许系统中的数据存在中间状态，并认为该中间状态的存在不会影响系统的整体可用性，即循序系统在不同节点间的数据副本之间进行数据同步过程中存在一定的延时。<h3 id="E：最终一致性（Eventually-consistent）"><a href="#E：最终一致性（Eventually-consistent）" class="headerlink" title="E：最终一致性（Eventually consistent）"></a>E：最终一致性（Eventually consistent）</h3>最终一致性情调的是系统中的所有数据副本，在经过一段时间的同步后，最终能够达到一个一致的状态。因此，最终一致性需要系统保证最终数据能够达到一致，而不需要实时保证系统数据的强一致性。<h3 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h3>BASE理论是面向大型高可用可拓展的分布式系统，和传统事物的ACID特性相反，它完全不同于ACID的强一致性模型，而是牺牲强一致性来获得可用性，并循序数据在一段时间内是不一致的，但最终达到一致状态。</li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;分布式事物的CAP-BASE定理&quot;&gt;&lt;a href=&quot;#分布式事物的CAP-BASE定理&quot; class=&quot;headerlink&quot; title=&quot;分布式事物的CAP/BASE定理&quot;&gt;&lt;/a&gt;分布式事物的CAP/BASE定理&lt;/h1&gt;&lt;blockquote&gt;
+&lt;blo
+      
+    
+    </summary>
+    
+    
+      <category term="分布式理论基础" scheme="http://ipopker.com/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80/"/>
+    
+  </entry>
   
   <entry>
     <title>OrderBy字符串排序规则和在InnoDB中的性能优化</title>
@@ -37,30 +107,6 @@
     
     
       <category term="MySQL" scheme="http://ipopker.com/tags/MySQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>又一次搭建完成</title>
-    <link href="http://ipopker.com/2018/04/03/test/"/>
-    <id>http://ipopker.com/2018/04/03/test/</id>
-    <published>2018-04-03T02:13:47.000Z</published>
-    <updated>2018-08-05T09:30:53.964Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="又一次搭建完成"><a href="#又一次搭建完成" class="headerlink" title="又一次搭建完成"></a>又一次搭建完成</h1><p>以后会在这里记录学习、生活。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;又一次搭建完成&quot;&gt;&lt;a href=&quot;#又一次搭建完成&quot; class=&quot;headerlink&quot; title=&quot;又一次搭建完成&quot;&gt;&lt;/a&gt;又一次搭建完成&lt;/h1&gt;&lt;p&gt;以后会在这里记录学习、生活。&lt;/p&gt;
-
-      
-    
-    </summary>
-    
-    
-      <category term="随笔" scheme="http://ipopker.com/tags/%E9%9A%8F%E7%AC%94/"/>
     
   </entry>
   

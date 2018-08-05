@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>kafka特性设计和实现-翻译自官方文档 | iPopker&#39;s Blog | 放我去写代码</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="kafka">
+    <meta name="description" content="kafka特性设计和实现-翻译自官方文档概述kafka是最初由Linkedin公司开发，使用Scala语言编写，Kafka是一个分布式、分区的、多副本的、多订阅者的日志系统(分布式MQ系统)，它的特性如下：  通过O(1)的磁盘数据结构提供消息的持久化，这种结构对于即使数以TB的消息存储也能够保持长时间的稳定性能。 高吞吐量：即使是非常普通的硬件kafka也可以支持每秒数十万的消息。 支持同步和异">
+<meta name="keywords" content="kafka">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kafka特性设计和实现-翻译自官方文档">
+<meta property="og:url" content="http://ipopker.com/2018/08/05/kafka特性设计和实现-翻译自官方文档/index.html">
+<meta property="og:site_name" content="iPopker&#39;s Blog">
+<meta property="og:description" content="kafka特性设计和实现-翻译自官方文档概述kafka是最初由Linkedin公司开发，使用Scala语言编写，Kafka是一个分布式、分区的、多副本的、多订阅者的日志系统(分布式MQ系统)，它的特性如下：  通过O(1)的磁盘数据结构提供消息的持久化，这种结构对于即使数以TB的消息存储也能够保持长时间的稳定性能。 高吞吐量：即使是非常普通的硬件kafka也可以支持每秒数十万的消息。 支持同步和异">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-08-05T11:30:43.040Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="kafka特性设计和实现-翻译自官方文档">
+<meta name="twitter:description" content="kafka特性设计和实现-翻译自官方文档概述kafka是最初由Linkedin公司开发，使用Scala语言编写，Kafka是一个分布式、分区的、多副本的、多订阅者的日志系统(分布式MQ系统)，它的特性如下：  通过O(1)的磁盘数据结构提供消息的持久化，这种结构对于即使数以TB的消息存储也能够保持长时间的稳定性能。 高吞吐量：即使是非常普通的硬件kafka也可以支持每秒数十万的消息。 支持同步和异">
+    
+        <link rel="alternate" type="application/atom+xml" title="iPopker&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">iPopker</h5>
+          <a href="mailto:j172045149@163.com" title="j172045149@163.com" class="mail">j172045149@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Popker" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">kafka特性设计和实现-翻译自官方文档</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">kafka特性设计和实现-翻译自官方文档</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2018-08-05T11:22:25.000Z" itemprop="datePublished" class="page-time">
+  2018-08-05
+</time>
+
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#kafka特性设计和实现-翻译自官方文档"><span class="post-toc-number">1.</span> <span class="post-toc-text">kafka特性设计和实现-翻译自官方文档</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#概述"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">概述</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#持久性设计与性能优化"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">持久性设计与性能优化</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#生产者-Producer-的负载均衡与数据传输优化"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">生产者(Producer)的负载均衡与数据传输优化</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#生产者负载均衡"><span class="post-toc-number">1.3.1.</span> <span class="post-toc-text">生产者负载均衡</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#生产者的数据传输优化"><span class="post-toc-number">1.3.2.</span> <span class="post-toc-text">生产者的数据传输优化</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#消费者-Consumer-对于“推拉”的权衡以及处理已消费信息的优化"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">消费者(Consumer)对于“推拉”的权衡以及处理已消费信息的优化</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#push还是pull？"><span class="post-toc-number">1.4.1.</span> <span class="post-toc-text">push还是pull？</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#已消费的信息处理"><span class="post-toc-number">1.4.2.</span> <span class="post-toc-text">已消费的信息处理</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#kafka的信息传递保证"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">kafka的信息传递保证</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-kafka特性设计和实现-翻译自官方文档"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">kafka特性设计和实现-翻译自官方文档</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2018-08-05 19:22:25" datetime="2018-08-05T11:22:25.000Z"  itemprop="datePublished">2018-08-05</time>
+
+            
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="kafka特性设计和实现-翻译自官方文档"><a href="#kafka特性设计和实现-翻译自官方文档" class="headerlink" title="kafka特性设计和实现-翻译自官方文档"></a>kafka特性设计和实现-翻译自官方文档</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>kafka是最初由Linkedin公司开发，使用Scala语言编写，Kafka是一个分布式、分区的、多副本的、多订阅者的日志系统(分布式MQ系统)，它的特性如下：</p>
+<ul>
+<li>通过<strong>O(1)的磁盘数据结构提供消息的持久化</strong>，这种结构对于即使数以TB的消息存储也能够保持长时间的稳定性能。</li>
+<li>高吞吐量：即使是非常普通的硬件kafka也可以支持每秒数十万的消息。</li>
+<li>支持同步和异步复制两种HA</li>
+<li><strong>Consumer客户端pull</strong>，<strong>随机读利用sendfile系统调用实现zero-copy</strong> ,批量拉数据</li>
+<li>消费状态保存在客户端</li>
+<li>消息存储顺序写</li>
+<li>数据迁移、扩容对用户透明</li>
+<li>支持Hadoop并行数据加载。</li>
+<li>支持online和offline的场景。</li>
+<li>持久化：通过将<strong>数据持久化到硬盘</strong>以及<strong>replication</strong>防止数据丢失。</li>
+<li><strong>scale out：无需停机即可扩展机器。</strong></li>
+<li>定期删除机制，支持设定partitions的segment file保留时间。 </li>
+</ul>
+<h2 id="持久性设计与性能优化"><a href="#持久性设计与性能优化" class="headerlink" title="持久性设计与性能优化"></a>持久性设计与性能优化</h2><p>kafka在很大程度上依赖文件系统来存储和缓存消息。为了尽量缩小磁盘与内存带来的性能差异，kafka在设计上采用一些特殊设计提升性能和效率：</p>
+<ul>
+<li>kafka会保持以<strong>顺序的方式</strong>对硬盘进行读写（对于机械硬盘来说，随机读写带来的多余磁头寻道时间让读写速度远远慢于顺序读写）；</li>
+<li>依赖于OS的<strong>page cache（页高速缓冲存储器）</strong>，page cache的大小为一页，通常为4K。在linux读写文件时，它用于缓存文件的逻辑内容，从而加快对磁盘上映像和数据的访问。详情见： <a href="https://blog.csdn.net/xf_xjtu/article/details/46382119" target="_blank" rel="noopener">Linux Page Cache机制</a></li>
+<li><strong>直接在文件上进行读取和添加（append）</strong>，这样的磁盘数据结构比起传统消息队列用的持久化数据结构如b-tree等更快，所有操作达到了O（1），并且读和写并不会互相影响。</li>
+<li>为了减少字节复制，提高效率，kafka采用了<strong>Linux下的sendfile来实现zero-copy</strong>。现代的unix操作系统提供了一个高度优化的代码路径，用于将数据从页面缓存转移到套接字; 在Linux中，这是通过sendfile系统调用完成的。要理解sendfile的影响，了解数据从文件传输到套接字的常见数据路径非常重要：<br>1.操作系统将数据从磁盘读取到内核空间的pagecache中<br>2.应用程序从内核空间读取数据到用户空间缓冲区<br>3.应用程序将数据写回内核空间到套接字缓冲区<br>4.操作系统将数据从套接字缓冲区复制到通过网络发送的NIC缓冲区<br>这显然是低效的，有四个副本和两个系统调用。使用sendfile，通过允许操作系统将数据从pagecache直接发送到网络，可以避免重新复制。所以在这个优化的路径中，只需要最终拷贝到NIC缓冲区。</li>
+<li>很多时候性能瓶颈不在cpu或者磁盘，而在于网络。Kafka以高效的批处理格式支持压缩。一批消息可以压缩在一起并以这种形式发送到服务器。这批消息将以压缩格式写入，并将保持压缩在日志中，只会由消费者解压缩。Kafka支持GZIP，Snappy和LZ4压缩协议。</li>
+</ul>
+<h2 id="生产者-Producer-的负载均衡与数据传输优化"><a href="#生产者-Producer-的负载均衡与数据传输优化" class="headerlink" title="生产者(Producer)的负载均衡与数据传输优化"></a>生产者(Producer)的负载均衡与数据传输优化</h2><h3 id="生产者负载均衡"><a href="#生产者负载均衡" class="headerlink" title="生产者负载均衡"></a>生产者负载均衡</h3><ol>
+<li>producer 端的配置文件中，指定 Kafka 的 broker 信息； </li>
+<li>kafka集群中的任何一个broker，都可以向producer提供metadata信息；<br>这些metadata中包含”集群中存活的servers列表”、”partitions leader列表”等信息(请参看zookeeper中的节点信息)； </li>
+<li>当producer获取到metadata信息之后，producer将会和Topic下所有partition leader保持socket连接； </li>
+<li>消息由producer直接通过socket发送到broker，中间不会经过任何”路由层”；<br>消息被路由到哪个partition上，由producer客户端决定，比如，可以采用”random”、”key-hash”、”轮询”等，如果一个topic中有多个partitions,那么在producer端实现”消息均衡分发”是必要的；</li>
+</ol>
+<h3 id="生产者的数据传输优化"><a href="#生产者的数据传输优化" class="headerlink" title="生产者的数据传输优化"></a>生产者的数据传输优化</h3><p>kafka会试图在内存中积累数据，并在一个请求中发送大批量的数据。批处理可以被配置为累加不超过固定数量的消息并且不超过某个固定的延迟限制（比如64k或10ms）。这允许发送更多字节的累积，并且在服务器上几个较大的I / O操作。这种缓冲是可配置的，并提供了一种机制来折中少量额外的延迟以获得更好的吞吐量。</p>
+<h2 id="消费者-Consumer-对于“推拉”的权衡以及处理已消费信息的优化"><a href="#消费者-Consumer-对于“推拉”的权衡以及处理已消费信息的优化" class="headerlink" title="消费者(Consumer)对于“推拉”的权衡以及处理已消费信息的优化"></a>消费者(Consumer)对于“推拉”的权衡以及处理已消费信息的优化</h2><h3 id="push还是pull？"><a href="#push还是pull？" class="headerlink" title="push还是pull？"></a>push还是pull？</h3><p>消费者是应该从brokers那里pull数据，还是让brokers向消费者那里push数据？这方面，kafka采用了一种更为传统的设计方式，由大多mq共享，数据从生产者推送给brokers，由消费者从brokers那里pull。一些以日志为中心的系统，如Scribe和 Apache Flume，遵循一个非常不同的推送路径，数据被push到下游。这两种方法都有优点和缺点。然而，基于推送的系统难以处理不同的消费者，因为brokers控制数据传输的速度。目标通常是消费者能够以最大可能的速度消费; 不幸的是，在推动系统中，这意味着当消费率低于生产率（本质上是拒绝服务攻击）时，消费者容易垮掉。基于pull的系统具有更好的属性，消费者消费速度只要落后就会在它可以的时候赶上。<br>基于pull的系统的另一个优点是，它可以将数据发送给消费者，基于推送的系统必须选择立即发送数据，或者累积更多的数据，然后在不知道下游消费者是否能够立即处理的情况下发送。如果调整为低延迟，则这将导致一次只发送单个消息，以便传输结束被缓冲，这是浪费的。基于pull的设计修复了这个问题，因为消费者总是将所有可用的消息拉到日志中的当前位置（或达到某个可配置的最大大小）之后。所以可以获得最佳的数据流量而不会引入不必要的延迟<br>但基于pull的系统的缺点是，如果brokers没有数据，消费者可能会不断发送请求来感知数据到达。为了避免这种情况，我们在我们的pull请求中有一些参数，它们允许消费者请求以“长轮询”的方式进行阻塞，等待数据到达（并且可选地等待，直到给定数量的字节可用以确保大的传输大小）。</p>
+<h3 id="已消费的信息处理"><a href="#已消费的信息处理" class="headerlink" title="已消费的信息处理"></a>已消费的信息处理</h3><p>对于大多数mq，当消息被发送给消费者时，brokers要么立即在本地记录，要么等待消费者的确认。这是一个相当直观的选择，实际上对于单个机器服务器来说，不清楚这个数据可以去哪里。由于在许多消息传递系统中用于存储的数据结构规模较小，因此这也是一个实用的选择 - 由于代理知道消耗的是什么，它可以立即删除它，保持较小数据量。<br>kafka处理这个不同。topic被分成一组完全有序的分区，每个分区在任何给定的时间都被每个订阅消费者组中的一个消费者消费。这意味着消费者在每个分区中的位置只是一个整数，即要消耗的下一个消息的偏移量。这使得所消耗的状态非常小，每个分区只有一个数字。这个状态可以定期检查点。这使消息确认的代价非常低。<br>这个方案还有一个好处。消费者可以故意倒回到旧的偏移量并重新使用数据。这违反了队列的共同合同，但是对于许多消费者来说却是一个必不可少的特征。例如，如果消费者代码有一个错误，并且在一些消息被消费之后被发现，则消费者可以在错误修复后重新使用这些消息。</p>
+<h2 id="kafka的信息传递保证"><a href="#kafka的信息传递保证" class="headerlink" title="kafka的信息传递保证"></a>kafka的信息传递保证</h2><p>可能的信息传递保证：</p>
+<ul>
+<li>最多一次 -消息可能会丢失，但永远不会重新发送。</li>
+<li>至少一次 -消息永远不会丢失，但可以重新传递。</li>
+<li>恰恰一次 - 这就是人们真正想要的，每个信息只传递一次。<br>Kafka支持在KafkaStreams中一次交付，并且在Kafka topic之间传输和处理数据时，事务性生产者/消费者通常可用于提供准确一次的交付。其他目的地系统的一次交付通常需要与这些系统合作，但是Kafka提供了实现这种可行的补偿。否则，Kafka默认保证至少一次交付，并允许用户在处理一批消息之前，通过禁用生产者的重试和消费者的抵消来实现至多一次交付。</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-08-05T11:30:43.040Z" itemprop="dateUpdated">2018-08-05 19:30:43</time>
+</span><br>
+
+
+        
+        本页网址：<a href="/2018/08/05/kafka特性设计和实现-翻译自官方文档/" target="_blank" rel="external">http://ipopker.com/2018/08/05/kafka特性设计和实现-翻译自官方文档/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="http://ipopker.com">
+            <img src="/img/avatar.jpg" alt="iPopker">
+            iPopker
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kafka/">kafka</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://ipopker.com/2018/08/05/kafka特性设计和实现-翻译自官方文档/&title=《kafka特性设计和实现-翻译自官方文档》 — iPopker's Blog&pic=http://ipopker.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://ipopker.com/2018/08/05/kafka特性设计和实现-翻译自官方文档/&title=《kafka特性设计和实现-翻译自官方文档》 — iPopker's Blog&source=放我去写代码" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://ipopker.com/2018/08/05/kafka特性设计和实现-翻译自官方文档/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《kafka特性设计和实现-翻译自官方文档》 — iPopker's Blog&url=http://ipopker.com/2018/08/05/kafka特性设计和实现-翻译自官方文档/&via=http://ipopker.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://ipopker.com/2018/08/05/kafka特性设计和实现-翻译自官方文档/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/2018/08/05/分布式一致性协议（1）-2PC与3PC/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">分布式一致性协议（1）- 2PC与3PC</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2018/08/05/分布式事物的CAP-BASE定理/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">分布式事物的CAP/BASE定理</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>iPopker &copy; 2017 - 2018</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://ipopker.com/2018/08/05/kafka特性设计和实现-翻译自官方文档/&title=《kafka特性设计和实现-翻译自官方文档》 — iPopker's Blog&pic=http://ipopker.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://ipopker.com/2018/08/05/kafka特性设计和实现-翻译自官方文档/&title=《kafka特性设计和实现-翻译自官方文档》 — iPopker's Blog&source=放我去写代码" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://ipopker.com/2018/08/05/kafka特性设计和实现-翻译自官方文档/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《kafka特性设计和实现-翻译自官方文档》 — iPopker's Blog&url=http://ipopker.com/2018/08/05/kafka特性设计和实现-翻译自官方文档/&via=http://ipopker.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://ipopker.com/2018/08/05/kafka特性设计和实现-翻译自官方文档/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=http://ipopker.com/2018/08/05/kafka特性设计和实现-翻译自官方文档/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
