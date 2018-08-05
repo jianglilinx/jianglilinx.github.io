@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://ipopker.com/"/>
-  <updated>2018-08-05T09:38:54.262Z</updated>
+  <updated>2018-08-05T09:56:39.089Z</updated>
   <id>http://ipopker.com/</id>
   
   <author>
@@ -17,25 +17,26 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>mac</title>
-    <link href="http://ipopker.com/2018/08/05/mac/"/>
-    <id>http://ipopker.com/2018/08/05/mac/</id>
-    <published>2018-08-05T09:36:05.000Z</published>
-    <updated>2018-08-05T09:38:54.262Z</updated>
+    <title>OrderBy字符串排序规则和在InnoDB中的性能优化</title>
+    <link href="http://ipopker.com/2018/08/05/OrderBy%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%8E%92%E5%BA%8F%E8%A7%84%E5%88%99%E5%92%8C%E5%9C%A8InnoDB%E4%B8%AD%E7%9A%84%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/"/>
+    <id>http://ipopker.com/2018/08/05/OrderBy字符串排序规则和在InnoDB中的性能优化/</id>
+    <published>2018-08-05T09:49:48.000Z</published>
+    <updated>2018-08-05T09:56:39.089Z</updated>
     
-    <content type="html"><![CDATA[<h1 id="Test"><a href="#Test" class="headerlink" title="Test"></a>Test</h1>]]></content>
+    <content type="html"><![CDATA[<p>#OrderBy字符串排序规则和在InnoDB中的性能优化</p><h2 id="Order-by字符串排序规则"><a href="#Order-by字符串排序规则" class="headerlink" title="Order by字符串排序规则"></a>Order by字符串排序规则</h2><p>对于字符串来讲，排序规则可以在配置文件中my.ini中指定，主要有以下几个种类的排序规则：<br>（1） <strong>utf8_general_cs</strong> 和 <strong>utf8_general_ci</strong> （后缀”_cs”或者”_ci”意思是区分大小写和不区分大小写（Case Sensitive &amp; Case Insensitve））<br>（2） utf8_bin 规定每个字符串用二进制编码存储，区分大小写，可以直接存储二进制的内容<br>默认采取的utf8_general_ci <strong>不区分大小写</strong>，并且是按照<strong>逐位比较</strong>，如果相同再比较下一位的方法；如果想按照int方法排序，可以<strong>order by varchar+0</strong>。</p><h2 id="Order-by性能优化"><a href="#Order-by性能优化" class="headerlink" title="Order by性能优化"></a>Order by性能优化</h2><p>参考 <a href="https://dev.mysql.com/doc/refman/5.7/en/order-by-optimization.html" target="_blank" rel="noopener">MySQL 5.7 Reference Manual::ORDER BY Optimization</a>，假如有(key_part1,key_part2)的索引，在以下两种情况下MySQL会使用索引来避免排序操作：</p><ul><li><p><code>SELECT * FROM t1   ORDER BY key_part1, key_part2;</code><br>如果表项不只是key_part1,key_part2的话，那么MySQL优化器可能（不一定）不会通过索引来排序，因为扫描整个索引并且按照索引去查找出所有的行，花费的时间可能比直接查找出所有行再排序还慢。特别的，如果在InnoDB中，因为其特殊的索引存储结构（见聚簇索引），索引行和主键会存放在索引的B+树中，因此可以通过索引直接返回，极大提升排序速度：<br><code>SELECT pk, key_part1, key_part2 FROM t1   ORDER BY key_part1, key_part2;</code></p></li><li><p><code>SELECT * FROM t1   WHERE key_part1 = constant   ORDER BY key_part2;</code><br>当key_part1是常量时，自然可以先通过key_part1索引找出对应的行，再利用key_part2进行排序（常量用前缀索引去检索，另一部分用来排序）。</p></li></ul>]]></content>
     
     <summary type="html">
     
       
       
-        &lt;h1 id=&quot;Test&quot;&gt;&lt;a href=&quot;#Test&quot; class=&quot;headerlink&quot; title=&quot;Test&quot;&gt;&lt;/a&gt;Test&lt;/h1&gt;
+        &lt;p&gt;#OrderBy字符串排序规则和在InnoDB中的性能优化&lt;/p&gt;
+&lt;h2 id=&quot;Order-by字符串排序规则&quot;&gt;&lt;a href=&quot;#Order-by字符串排序规则&quot; class=&quot;headerlink&quot; title=&quot;Order by字符串排序规则&quot;&gt;&lt;/a&gt;Orde
       
     
     </summary>
     
     
-      <category term="Java" scheme="http://ipopker.com/tags/Java/"/>
+      <category term="MySQL" scheme="http://ipopker.com/tags/MySQL/"/>
     
   </entry>
   

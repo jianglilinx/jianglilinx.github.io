@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>OrderBy字符串排序规则和在InnoDB中的性能优化 | iPopker&#39;s Blog | 放我去写代码</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="MySQL">
+    <meta name="description" content="#OrderBy字符串排序规则和在InnoDB中的性能优化 Order by字符串排序规则对于字符串来讲，排序规则可以在配置文件中my.ini中指定，主要有以下几个种类的排序规则：（1） utf8_general_cs 和 utf8_general_ci （后缀”_cs”或者”_ci”意思是区分大小写和不区分大小写（Case Sensitive &amp;amp; Case Insensitve））（2）">
+<meta name="keywords" content="MySQL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OrderBy字符串排序规则和在InnoDB中的性能优化">
+<meta property="og:url" content="http://ipopker.com/2018/08/05/OrderBy字符串排序规则和在InnoDB中的性能优化/index.html">
+<meta property="og:site_name" content="iPopker&#39;s Blog">
+<meta property="og:description" content="#OrderBy字符串排序规则和在InnoDB中的性能优化 Order by字符串排序规则对于字符串来讲，排序规则可以在配置文件中my.ini中指定，主要有以下几个种类的排序规则：（1） utf8_general_cs 和 utf8_general_ci （后缀”_cs”或者”_ci”意思是区分大小写和不区分大小写（Case Sensitive &amp;amp; Case Insensitve））（2）">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-08-05T09:56:39.089Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OrderBy字符串排序规则和在InnoDB中的性能优化">
+<meta name="twitter:description" content="#OrderBy字符串排序规则和在InnoDB中的性能优化 Order by字符串排序规则对于字符串来讲，排序规则可以在配置文件中my.ini中指定，主要有以下几个种类的排序规则：（1） utf8_general_cs 和 utf8_general_ci （后缀”_cs”或者”_ci”意思是区分大小写和不区分大小写（Case Sensitive &amp;amp; Case Insensitve））（2）">
+    
+        <link rel="alternate" type="application/atom+xml" title="iPopker&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">iPopker</h5>
+          <a href="mailto:j172045149@163.com" title="j172045149@163.com" class="mail">j172045149@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Popker" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">OrderBy字符串排序规则和在InnoDB中的性能优化</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="global.search_input_hint">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">OrderBy字符串排序规则和在InnoDB中的性能优化</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2018-08-05T09:49:48.000Z" itemprop="datePublished" class="page-time">
+  2018-08-05
+</time>
+
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Order-by字符串排序规则"><span class="post-toc-number">1.</span> <span class="post-toc-text">Order by字符串排序规则</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Order-by性能优化"><span class="post-toc-number">2.</span> <span class="post-toc-text">Order by性能优化</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-OrderBy字符串排序规则和在InnoDB中的性能优化"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">OrderBy字符串排序规则和在InnoDB中的性能优化</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2018-08-05 17:49:48" datetime="2018-08-05T09:49:48.000Z"  itemprop="datePublished">2018-08-05</time>
+
+            
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>#OrderBy字符串排序规则和在InnoDB中的性能优化</p>
+<h2 id="Order-by字符串排序规则"><a href="#Order-by字符串排序规则" class="headerlink" title="Order by字符串排序规则"></a>Order by字符串排序规则</h2><p>对于字符串来讲，排序规则可以在配置文件中my.ini中指定，主要有以下几个种类的排序规则：<br>（1） <strong>utf8_general_cs</strong> 和 <strong>utf8_general_ci</strong> （后缀”_cs”或者”_ci”意思是区分大小写和不区分大小写（Case Sensitive &amp; Case Insensitve））<br>（2） utf8_bin 规定每个字符串用二进制编码存储，区分大小写，可以直接存储二进制的内容<br>默认采取的utf8_general_ci <strong>不区分大小写</strong>，并且是按照<strong>逐位比较</strong>，如果相同再比较下一位的方法；如果想按照int方法排序，可以<strong>order by varchar+0</strong>。</p>
+<h2 id="Order-by性能优化"><a href="#Order-by性能优化" class="headerlink" title="Order by性能优化"></a>Order by性能优化</h2><p>参考 <a href="https://dev.mysql.com/doc/refman/5.7/en/order-by-optimization.html" target="_blank" rel="noopener">MySQL 5.7 Reference Manual::ORDER BY Optimization</a>，假如有(key_part1,key_part2)的索引，在以下两种情况下MySQL会使用索引来避免排序操作：</p>
+<ul>
+<li><p><code>SELECT * FROM t1   ORDER BY key_part1, key_part2;</code><br>如果表项不只是key_part1,key_part2的话，那么MySQL优化器可能（不一定）不会通过索引来排序，因为扫描整个索引并且按照索引去查找出所有的行，花费的时间可能比直接查找出所有行再排序还慢。特别的，如果在InnoDB中，因为其特殊的索引存储结构（见聚簇索引），索引行和主键会存放在索引的B+树中，因此可以通过索引直接返回，极大提升排序速度：<br><code>SELECT pk, key_part1, key_part2 FROM t1   ORDER BY key_part1, key_part2;</code></p>
+</li>
+<li><p><code>SELECT * FROM t1   WHERE key_part1 = constant   ORDER BY key_part2;</code><br>当key_part1是常量时，自然可以先通过key_part1索引找出对应的行，再利用key_part2进行排序（常量用前缀索引去检索，另一部分用来排序）。</p>
+</li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    post.last_updated<time datetime="2018-08-05T09:56:39.089Z" itemprop="dateUpdated">2018-08-05 17:56:39</time>
+</span><br>
+
+
+        
+        本页网址：<a href="/2018/08/05/OrderBy字符串排序规则和在InnoDB中的性能优化/" target="_blank" rel="external">http://ipopker.com/2018/08/05/OrderBy字符串排序规则和在InnoDB中的性能优化/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="http://ipopker.com">
+            <img src="/img/avatar.jpg" alt="iPopker">
+            iPopker
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/MySQL/">MySQL</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://ipopker.com/2018/08/05/OrderBy字符串排序规则和在InnoDB中的性能优化/&title=《OrderBy字符串排序规则和在InnoDB中的性能优化》 — iPopker's Blog&pic=http://ipopker.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://ipopker.com/2018/08/05/OrderBy字符串排序规则和在InnoDB中的性能优化/&title=《OrderBy字符串排序规则和在InnoDB中的性能优化》 — iPopker's Blog&source=放我去写代码" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://ipopker.com/2018/08/05/OrderBy字符串排序规则和在InnoDB中的性能优化/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《OrderBy字符串排序规则和在InnoDB中的性能优化》 — iPopker's Blog&url=http://ipopker.com/2018/08/05/OrderBy字符串排序规则和在InnoDB中的性能优化/&via=http://ipopker.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://ipopker.com/2018/08/05/OrderBy字符串排序规则和在InnoDB中的性能优化/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2018/04/03/test/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">又一次搭建完成</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>footer.license</span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>iPopker &copy; 2017 - 2018</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://ipopker.com/2018/08/05/OrderBy字符串排序规则和在InnoDB中的性能优化/&title=《OrderBy字符串排序规则和在InnoDB中的性能优化》 — iPopker's Blog&pic=http://ipopker.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://ipopker.com/2018/08/05/OrderBy字符串排序规则和在InnoDB中的性能优化/&title=《OrderBy字符串排序规则和在InnoDB中的性能优化》 — iPopker's Blog&source=放我去写代码" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://ipopker.com/2018/08/05/OrderBy字符串排序规则和在InnoDB中的性能优化/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《OrderBy字符串排序规则和在InnoDB中的性能优化》 — iPopker's Blog&url=http://ipopker.com/2018/08/05/OrderBy字符串排序规则和在InnoDB中的性能优化/&via=http://ipopker.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://ipopker.com/2018/08/05/OrderBy字符串排序规则和在InnoDB中的性能优化/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=http://ipopker.com/2018/08/05/OrderBy字符串排序规则和在InnoDB中的性能优化/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
