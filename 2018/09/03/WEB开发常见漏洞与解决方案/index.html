@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    <title>WEB开发常见漏洞与解决方案 | iPopker&#39;s Blog | 放我去写代码</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="">
+    <meta name="description" content="WEB开发常见漏洞与解决方案SQL注入定义：通过把SQL命令插入到Web表单提交或输入域名或页面请求的查询字符串，最终达到欺骗服务器执行恶意的SQL命令 防范：SQL注入只对SQL语句的编译过程有破坏作 用，而PreparedStatement已经准备好了，执行 阶段只是把输入串作为数据处理，而不再对语句进 行解析，因此也就避免了SQL注入问题。（在Mybatis中，#{}：相当于JDBC中">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WEB开发常见漏洞与解决方案">
+<meta property="og:url" content="http://ipopker.com/2018/09/03/WEB开发常见漏洞与解决方案/index.html">
+<meta property="og:site_name" content="iPopker&#39;s Blog">
+<meta property="og:description" content="WEB开发常见漏洞与解决方案SQL注入定义：通过把SQL命令插入到Web表单提交或输入域名或页面请求的查询字符串，最终达到欺骗服务器执行恶意的SQL命令 防范：SQL注入只对SQL语句的编译过程有破坏作 用，而PreparedStatement已经准备好了，执行 阶段只是把输入串作为数据处理，而不再对语句进 行解析，因此也就避免了SQL注入问题。（在Mybatis中，#{}：相当于JDBC中">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-09-03T02:35:44.724Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WEB开发常见漏洞与解决方案">
+<meta name="twitter:description" content="WEB开发常见漏洞与解决方案SQL注入定义：通过把SQL命令插入到Web表单提交或输入域名或页面请求的查询字符串，最终达到欺骗服务器执行恶意的SQL命令 防范：SQL注入只对SQL语句的编译过程有破坏作 用，而PreparedStatement已经准备好了，执行 阶段只是把输入串作为数据处理，而不再对语句进 行解析，因此也就避免了SQL注入问题。（在Mybatis中，#{}：相当于JDBC中">
+    
+        <link rel="alternate" type="application/atom+xml" title="iPopker&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">iPopker</h5>
+          <a href="mailto:j172045149@163.com" title="j172045149@163.com" class="mail">j172045149@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                Archives
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                Tags
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Popker" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">WEB开发常见漏洞与解决方案</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">WEB开发常见漏洞与解决方案</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2018-09-03T02:34:40.000Z" itemprop="datePublished" class="page-time">
+  2018-09-03
+</time>
+
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#WEB开发常见漏洞与解决方案"><span class="post-toc-number">1.</span> <span class="post-toc-text">WEB开发常见漏洞与解决方案</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#SQL注入"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">SQL注入</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#XSS漏洞"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">XSS漏洞</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#任意文件上传-下载"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">任意文件上传/下载</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#CSRF"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">CSRF</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#水平越权"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">水平越权</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#cors配置不当"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">cors配置不当</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#其他风险"><span class="post-toc-number">1.7.</span> <span class="post-toc-text">其他风险</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-WEB开发常见漏洞与解决方案"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">WEB开发常见漏洞与解决方案</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2018-09-03 10:34:40" datetime="2018-09-03T02:34:40.000Z"  itemprop="datePublished">2018-09-03</time>
+
+            
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="WEB开发常见漏洞与解决方案"><a href="#WEB开发常见漏洞与解决方案" class="headerlink" title="WEB开发常见漏洞与解决方案"></a>WEB开发常见漏洞与解决方案</h1><h2 id="SQL注入"><a href="#SQL注入" class="headerlink" title="SQL注入"></a>SQL注入</h2><p>定义：通过把SQL命令插入到Web表单提交或输入域名或页面请求的查询字符串，最终达到欺骗服务器执行恶意的SQL命令</p>
+<p>防范：SQL注入只对SQL语句的编译过程有破坏作 用，而PreparedStatement已经准备好了，执行 阶段只是把输入串作为数据处理，而不再对语句进 行解析，因此也就避免了SQL注入问题。（在Mybatis中，#{}：相当于JDBC中的PreparedStatement，经过预编译的，是安全的。${}：是输出变量的值，是未经过预编译的，仅仅是取变量的值，是非安全的，存在SQL注入。）</p>
+<h2 id="XSS漏洞"><a href="#XSS漏洞" class="headerlink" title="XSS漏洞"></a>XSS漏洞</h2><p>定义：XSS是一种经常出现在web应用中的计算机安全漏洞，它允许恶意web用户将代码植入到提供给其它用户使用的页面中。比如这些代码包括HTML代码和客户端脚本。</p>
+<p>防范： <script>alert()</script>可以执行任意脚本，可 以从输入、输出两个角度去考虑防御。</p>
+<ul>
+<li>输入不处理，输出时根据应用场景统一工具类进行转义</li>
+<li>CSP 全称为 Content Security Policy，即内容安全策略，是一种开发者定义的安全策略声明，可以阻止恶意内容在受信 web 页面上下文中的执行，减少 XSS、clickjacking、code inject 等攻击。其主要以“白名单”的形式指定可信的内容来源，或是控制一些安全相关的选项。</li>
+</ul>
+<h2 id="任意文件上传-下载"><a href="#任意文件上传-下载" class="headerlink" title="任意文件上传/下载"></a>任意文件上传/下载</h2><p>定义：</p>
+<ul>
+<li>上传：文件上传漏洞是指网络攻击者上传了一个可执行的文件到服务器并执行。这里上传的文件可以是木马，病毒，恶意脚本或者WebShell等。</li>
+<li>下载：一些网站由于业务需求，可能提供文件查看或下载的功能，如果对用户查看或下载的文件不做限制，则恶意用户就能够查看或下载任意的文件，可以是源代码文件、敏感文件等，就会造成任意文件下载漏洞。</li>
+</ul>
+<p>防范：</p>
+<ul>
+<li>上传：限制目录不可执行、上传文件类型检查、上传文件大小检查</li>
+<li>下载：禁止客户端自定义下载路径</li>
+</ul>
+<h2 id="CSRF"><a href="#CSRF" class="headerlink" title="CSRF"></a>CSRF</h2><p>定义：跨站请求伪造(Cross- site request forgery)，能够在用户不知情的情况下发起请求。与跨网站脚本(XSS) 相比，XSS利用的是用户对指定网站的信任， CSRF利用的是网站对用户网页浏览器的信任 。</p>
+<p>防范：</p>
+<ul>
+<li>请求带随机数：每次请求带有一次有效随机数(隐藏input)</li>
+<li>避免跨域请求：1.校验origin、referer 2.post发送Json数据</li>
+<li>浏览器的跨域策略：Double Submit Cookie</li>
+</ul>
+<h2 id="水平越权"><a href="#水平越权" class="headerlink" title="水平越权"></a>水平越权</h2><p>定义：水平权限漏洞一般出现在一个用户对象关联多个其他对象（订单、地址等）、并且要实现对关联对象的CRUD的时候。开发容易习惯性的在生成CRUD表单（或AJAX请求）的时候根据认证过的用户身份来找出其有权限的被操作对象id，提供入口，然后让用户提交请求，并根据这个id来操作相关对象。在处理CRUD请求时，往往默认只有有权限的用户才能得到入口，进而才能操作相关对象，因此就不再校验权限了。可悲剧的是大多数对象的ID都被设置为自增整型，所以攻击者只要对相关id加1、减1、直至遍历，就可以操作其他用户所关联的对象了。</p>
+<p>防范：把权限的控制转移到数据接口层中，要求web层在调用数据接口层的接口时额外提供userid，而这个userid在web层看来只能通过seesion来取到。这样在面对水平权限攻击时，web层的开发者不用额外花精力去注意鉴权的事情，也不需要增加一个SQL来专门判断权限——如果权限不对的话，那个and条件就满足不了，SQL自然就找不到相关对象去操作。而且这个方案对于一个接口多个地方使用的情况也比较有利，不需要每个地方都鉴权了。</p>
+<h2 id="cors配置不当"><a href="#cors配置不当" class="headerlink" title="cors配置不当"></a>cors配置不当</h2><p>定义：</p>
+<ol>
+<li>网站A存在cors配置不当</li>
+<li>攻击者在自己的网站B构造ajax,请求A网站的接口</li>
+<li>当用户访问B网站页面时，触发跨域</li>
+<li>请求A网站接口，返回的数据存入 攻击者网站。</li>
+</ol>
+<p>防范：例如<a href="http://www.api.com仅允许www.example.com发起的跨域请求" target="_blank" rel="noopener">www.api.com仅允许www.example.com发起的跨域请求</a>: httpResponse.setHeader(“Access-Control-Allow-Origin”,”<a href="http://www.example.com&quot;)" target="_blank" rel="noopener">www.example.com&quot;)</a>;</p>
+<h2 id="其他风险"><a href="#其他风险" class="headerlink" title="其他风险"></a>其他风险</h2><p>URL传输token：</p>
+<ol>
+<li>访问日志泄露用户认证凭证 </li>
+<li>referer泄露用户认证凭证</li>
+</ol>
+<p>日志审计:</p>
+<ol>
+<li>禁止记录：密码、CVV、有效期、session等C4类敏 感信息禁止打印日志。</li>
+<li>需要记录日志:时间、地点、人物、起因、经过、结果 时间、IP、username、url、内容、成功/失败</li>
+<li>日志管理:保存至少6个月以上、异地备份、管理员禁止删除日志</li>
+</ol>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2018-09-03T02:35:44.724Z" itemprop="dateUpdated">2018-09-03 10:35:44</time>
+</span><br>
+
+
+        
+        本页网址：<a href="/2018/09/03/WEB开发常见漏洞与解决方案/" target="_blank" rel="external">http://ipopker.com/2018/09/03/WEB开发常见漏洞与解决方案/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="http://ipopker.com">
+            <img src="/img/avatar.jpg" alt="iPopker">
+            iPopker
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://ipopker.com/2018/09/03/WEB开发常见漏洞与解决方案/&title=《WEB开发常见漏洞与解决方案》 — iPopker's Blog&pic=http://ipopker.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://ipopker.com/2018/09/03/WEB开发常见漏洞与解决方案/&title=《WEB开发常见漏洞与解决方案》 — iPopker's Blog&source=放我去写代码" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://ipopker.com/2018/09/03/WEB开发常见漏洞与解决方案/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《WEB开发常见漏洞与解决方案》 — iPopker's Blog&url=http://ipopker.com/2018/09/03/WEB开发常见漏洞与解决方案/&via=http://ipopker.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://ipopker.com/2018/09/03/WEB开发常见漏洞与解决方案/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2018/08/05/OrderBy字符串排序规则和在InnoDB中的性能优化/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">OrderBy字符串排序规则和在InnoDB中的性能优化</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>iPopker &copy; 2017 - 2018</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://ipopker.com/2018/09/03/WEB开发常见漏洞与解决方案/&title=《WEB开发常见漏洞与解决方案》 — iPopker's Blog&pic=http://ipopker.com/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://ipopker.com/2018/09/03/WEB开发常见漏洞与解决方案/&title=《WEB开发常见漏洞与解决方案》 — iPopker's Blog&source=放我去写代码" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://ipopker.com/2018/09/03/WEB开发常见漏洞与解决方案/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《WEB开发常见漏洞与解决方案》 — iPopker's Blog&url=http://ipopker.com/2018/09/03/WEB开发常见漏洞与解决方案/&via=http://ipopker.com" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://ipopker.com/2018/09/03/WEB开发常见漏洞与解决方案/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=http://ipopker.com/2018/09/03/WEB开发常见漏洞与解决方案/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
