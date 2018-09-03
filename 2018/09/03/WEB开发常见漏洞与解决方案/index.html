@@ -28,7 +28,7 @@
 <meta property="og:site_name" content="iPopker&#39;s Blog">
 <meta property="og:description" content="WEB开发常见漏洞与解决方案SQL注入定义：通过把SQL命令插入到Web表单提交或输入域名或页面请求的查询字符串，最终达到欺骗服务器执行恶意的SQL命令 防范：SQL注入只对SQL语句的编译过程有破坏作 用，而PreparedStatement已经准备好了，执行 阶段只是把输入串作为数据处理，而不再对语句进 行解析，因此也就避免了SQL注入问题。（在Mybatis中，#{}：相当于JDBC中">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-09-03T02:37:42.578Z">
+<meta property="og:updated_time" content="2018-09-03T07:08:58.468Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="WEB开发常见漏洞与解决方案">
 <meta name="twitter:description" content="WEB开发常见漏洞与解决方案SQL注入定义：通过把SQL命令插入到Web表单提交或输入域名或页面请求的查询字符串，最终达到欺骗服务器执行恶意的SQL命令 防范：SQL注入只对SQL语句的编译过程有破坏作 用，而PreparedStatement已经准备好了，执行 阶段只是把输入串作为数据处理，而不再对语句进 行解析，因此也就避免了SQL注入问题。（在Mybatis中，#{}：相当于JDBC中">
@@ -177,7 +177,7 @@
             <h1 id="WEB开发常见漏洞与解决方案"><a href="#WEB开发常见漏洞与解决方案" class="headerlink" title="WEB开发常见漏洞与解决方案"></a>WEB开发常见漏洞与解决方案</h1><h2 id="SQL注入"><a href="#SQL注入" class="headerlink" title="SQL注入"></a>SQL注入</h2><p>定义：通过把SQL命令插入到Web表单提交或输入域名或页面请求的查询字符串，最终达到欺骗服务器执行恶意的SQL命令</p>
 <p>防范：SQL注入只对SQL语句的编译过程有破坏作 用，而PreparedStatement已经准备好了，执行 阶段只是把输入串作为数据处理，而不再对语句进 行解析，因此也就避免了SQL注入问题。（在Mybatis中，#{}：相当于JDBC中的PreparedStatement，经过预编译的，是安全的。${}：是输出变量的值，是未经过预编译的，仅仅是取变量的值，是非安全的，存在SQL注入。）</p>
 <h2 id="XSS漏洞"><a href="#XSS漏洞" class="headerlink" title="XSS漏洞"></a>XSS漏洞</h2><p>定义：XSS是一种经常出现在web应用中的计算机安全漏洞，它允许恶意web用户将代码植入到提供给其它用户使用的页面中。比如这些代码包括HTML代码和客户端脚本。</p>
-<p>防范： <script>alert()</script>可以执行任意脚本，可 以从输入、输出两个角度去考虑防御。</p>
+<p>防范： <code>&lt;script&gt;alert()&lt;/script&gt;</code>可以执行任意脚本，可 以从输入、输出两个角度去考虑防御。</p>
 <ul>
 <li>输入不处理，输出时根据应用场景统一工具类进行转义</li>
 <li>CSP 全称为 Content Security Policy，即内容安全策略，是一种开发者定义的安全策略声明，可以阻止恶意内容在受信 web 页面上下文中的执行，减少 XSS、clickjacking、code inject 等攻击。其主要以“白名单”的形式指定可信的内容来源，或是控制一些安全相关的选项。</li>
@@ -228,7 +228,7 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2018-09-03T02:37:42.578Z" itemprop="dateUpdated">2018-09-03 10:37:42</time>
+    最后更新时间：<time datetime="2018-09-03T07:08:58.468Z" itemprop="dateUpdated">2018-09-03 15:08:58</time>
 </span><br>
 
 
