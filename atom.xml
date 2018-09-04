@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://ipopker.com/"/>
-  <updated>2018-09-03T07:08:58.468Z</updated>
+  <updated>2018-09-04T11:54:56.252Z</updated>
   <id>http://ipopker.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Java 网络编程基础（一）- IO</title>
+    <link href="http://ipopker.com/2018/09/04/Java%E5%9F%BA%E7%A1%80-OIO%E7%9A%84%E4%BD%BF%E7%94%A8/"/>
+    <id>http://ipopker.com/2018/09/04/Java基础-OIO的使用/</id>
+    <published>2018-09-04T08:16:32.000Z</published>
+    <updated>2018-09-04T11:54:56.252Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="Java学习（一）-IO"><a href="#Java学习（一）-IO" class="headerlink" title="Java学习（一）- IO"></a>Java学习（一）- IO</h1><h2 id="Java-IO-java-io-包的内容"><a href="#Java-IO-java-io-包的内容" class="headerlink" title="Java IO(java.io)包的内容"></a>Java IO(java.io)包的内容</h2><p>Java IO包主要包含了输入和输出到文件、网络流、内存缓冲区等，却不包含开启网络链接的类，但只要打开了一个网络连接，我们就可以用Java IO的InputStream和OutputStream来进行读写操作；</p><h2 id="Java-IO类总结"><a href="#Java-IO类总结" class="headerlink" title="Java IO类总结"></a>Java IO类总结</h2><figure class="image-bubble">                <div class="img-lightbox">                    <div class="overlay"></div>                    <img src="https://s1.ax1x.com/2018/09/04/iSoE7V.md.jpg" alt="Java IO类梗概" title="">                </div>                <div class="image-caption">Java IO类梗概</div>            </figure><p>如上图所示，Java IO流主要分为字符流和字节流，Reader和Writer等读写是<strong>基于字符</strong>的，InputStream和OutputStream是<strong>基于字节流</strong>的。<br>除此之外，还有一个特殊的类java.io.RandomAccessFile，RandomAccessFile 虽然属于java.io下的类，但它不是InputStream或者OutputStream的子类；它也不同于FileInputStream和FileOutputStream。 FileIsnputStream 只能对文件进行读操作，而FileOutputStream 只能对文件进行写操作；RandomAccessFile与输入流和输出流不同之处就是RandomAccessFile可以<strong>访问文件的任意地方</strong>同时支持文件的读和写，并且它支持<strong>随机访问</strong>。RandomAccessFile包含InputStream的三个read方法，也包含OutputStream的三个write方法。同时RandomAccessFile还包含一系列的readXxx和writeXxx方法完成输入输出。 </p><h2 id="Java-IO异常处理"><a href="#Java-IO异常处理" class="headerlink" title="Java IO异常处理"></a>Java IO异常处理</h2><h3 id="Java7之前的Try-Catch-Finally处理风格"><a href="#Java7之前的Try-Catch-Finally处理风格" class="headerlink" title="Java7之前的Try-Catch-Finally处理风格"></a>Java7之前的Try-Catch-Finally处理风格</h3><pre><code>private static void printFile() throws IOException {    InputStream input = null;    try {        input = new FileInputStream(&quot;file.txt&quot;);        int data = input.read();        while(data != -1){            System.out.print((char) data);            data = input.read();        }    } finally {        if(input != null){            input.close();        }    }}</code></pre><p>看起来非常不简洁，很有可能导致许多批判Java人口中的高度问题。</p><h3 id="Java7后的Try-with-resources"><a href="#Java7后的Try-with-resources" class="headerlink" title="Java7后的Try-with-resources"></a>Java7后的Try-with-resources</h3><pre><code>private static void printFileJava7() throws IOException {    try(  FileInputStream     input         = new FileInputStream(&quot;file.txt&quot;);        BufferedInputStream bufferedInput = new BufferedInputStream(input)    ) {        int data = bufferedInput.read();        while(data != -1){            System.out.print((char) data);    data = bufferedInput.read();        }    }} </code></pre><p>创建的资源会按照与创建/排列相反的顺去去自动关闭，只要实现了AutoClosable接口的类（需要实现close()方法）都可以使用try-with-resources结构。</p><h2 id="OIO的并发问题"><a href="#OIO的并发问题" class="headerlink" title="OIO的并发问题"></a>OIO的并发问题</h2><p>对于同一个同一个InputStream/OutputStream或者Reader/Writer，不应当有多个线程进行操作,因为无法保证每个线程会读/写到哪里。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;Java学习（一）-IO&quot;&gt;&lt;a href=&quot;#Java学习（一）-IO&quot; class=&quot;headerlink&quot; title=&quot;Java学习（一）- IO&quot;&gt;&lt;/a&gt;Java学习（一）- IO&lt;/h1&gt;&lt;h2 id=&quot;Java-IO-java-io-包的内容&quot;&gt;&lt;
+      
+    
+    </summary>
+    
+    
+      <category term="Java SE" scheme="http://ipopker.com/tags/Java-SE/"/>
+    
+  </entry>
   
   <entry>
     <title>WEB开发常见漏洞与解决方案</title>
