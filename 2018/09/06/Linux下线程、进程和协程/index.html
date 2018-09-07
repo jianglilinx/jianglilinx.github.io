@@ -13,7 +13,7 @@
     
     
     
-    <title>Linux下线程、进程和协程 | iPopker&#39;s Blog | 放我去写代码</title>
+    <title>重新认识Linux下线程、进程和协程 | iPopker&#39;s Blog | 放我去写代码</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
     <meta name="theme-color" content="#3F51B5">
@@ -23,14 +23,14 @@
     <meta name="description" content="重新认识Linux下线程、进程和协程 最近在看美团技术博客时，Java NIO浅析中有一句话引起了我的注意：“在Linux这样的操作系统中，线程本质上就是一个进程”，让我对Linux下的线程和进程产生了更深入了解的想法，再翻阅资料后汇总到这篇文章。  如果在浏览器中查阅线程和进程，在大部分复制粘贴的博客里，我们大概可以了解到以下的信息：  进程是资源分配的最小单位，线程是cpu调度和分派的基本">
 <meta name="keywords" content="Linux,操作系统">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Linux下线程、进程和协程">
+<meta property="og:title" content="重新认识Linux下线程、进程和协程">
 <meta property="og:url" content="http://ipopker.com/2018/09/06/Linux下线程、进程和协程/index.html">
 <meta property="og:site_name" content="iPopker&#39;s Blog">
 <meta property="og:description" content="重新认识Linux下线程、进程和协程 最近在看美团技术博客时，Java NIO浅析中有一句话引起了我的注意：“在Linux这样的操作系统中，线程本质上就是一个进程”，让我对Linux下的线程和进程产生了更深入了解的想法，再翻阅资料后汇总到这篇文章。  如果在浏览器中查阅线程和进程，在大部分复制粘贴的博客里，我们大概可以了解到以下的信息：  进程是资源分配的最小单位，线程是cpu调度和分派的基本">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-09-07T07:22:50.720Z">
+<meta property="og:updated_time" content="2018-09-07T07:51:20.778Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Linux下线程、进程和协程">
+<meta name="twitter:title" content="重新认识Linux下线程、进程和协程">
 <meta name="twitter:description" content="重新认识Linux下线程、进程和协程 最近在看美团技术博客时，Java NIO浅析中有一句话引起了我的注意：“在Linux这样的操作系统中，线程本质上就是一个进程”，让我对Linux下的线程和进程产生了更深入了解的想法，再翻阅资料后汇总到这篇文章。  如果在浏览器中查阅线程和进程，在大部分复制粘贴的博客里，我们大概可以了解到以下的信息：  进程是资源分配的最小单位，线程是cpu调度和分派的基本">
     
         <link rel="alternate" type="application/atom+xml" title="iPopker&#39;s Blog" href="/atom.xml">
@@ -105,7 +105,7 @@
         <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
           <i class="icon icon-lg icon-navicon"></i>
         </a>
-        <div class="flex-col header-title ellipsis">Linux下线程、进程和协程</div>
+        <div class="flex-col header-title ellipsis">重新认识Linux下线程、进程和协程</div>
         
         <div class="search-wrap" id="search-wrap">
             <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
@@ -127,7 +127,7 @@
 <header class="content-header post-header">
 
     <div class="container fade-scale">
-        <h1 class="title">Linux下线程、进程和协程</h1>
+        <h1 class="title">重新认识Linux下线程、进程和协程</h1>
         <h5 class="subtitle">
             
                 <time datetime="2018-09-06T07:35:39.000Z" itemprop="datePublished" class="page-time">
@@ -159,7 +159,7 @@
   class="post-article article-type-post fade" itemprop="blogPost">
 
     <div class="post-card">
-        <h1 class="post-card-title">Linux下线程、进程和协程</h1>
+        <h1 class="post-card-title">重新认识Linux下线程、进程和协程</h1>
         <div class="post-meta">
             <time class="post-time" title="2018-09-06 15:35:39" datetime="2018-09-06T07:35:39.000Z"  itemprop="datePublished">2018-09-06</time>
 
@@ -175,7 +175,7 @@
         </div>
         <div class="post-content" id="post-content" itemprop="postContent">
             <h1 id="重新认识Linux下线程、进程和协程"><a href="#重新认识Linux下线程、进程和协程" class="headerlink" title="重新认识Linux下线程、进程和协程"></a>重新认识Linux下线程、进程和协程</h1><blockquote>
-<p>最近在看美团技术博客时，<a href="&quot;https://tech.meituan.com/nio.html&quot;">Java NIO浅析</a>中有一句话引起了我的注意：“在Linux这样的操作系统中，线程本质上就是一个进程”，让我对Linux下的线程和进程产生了更深入了解的想法，再翻阅资料后汇总到这篇文章。</p>
+<p>最近在看美团技术博客时，<a href="https://tech.meituan.com/nio.html" target="_blank">Java NIO浅析</a>中有一句话引起了我的注意：“在Linux这样的操作系统中，线程本质上就是一个进程”，让我对Linux下的线程和进程产生了更深入了解的想法，再翻阅资料后汇总到这篇文章。</p>
 </blockquote>
 <p>如果在浏览器中查阅线程和进程，在大部分复制粘贴的博客里，我们大概可以了解到以下的信息：</p>
 <ul>
@@ -189,7 +189,7 @@
 </ul>
 <p>在没认真深入翻看更多资料前，我对线程和进程的理解也止步于此，那么上述说的差异真的很大吗？</p>
 <hr>
-<h2 id="再看线程和进程的异同"><a href="#再看线程和进程的异同" class="headerlink" title="再看线程和进程的异同"></a>再看线程和进程的异同</h2><p>在美团技术博客中<a href="&quot;https://tech.meituan.com/nio.html&quot;">Java NIO浅析</a>所述“在Linux这样的操作系统中，线程本质上就是一个进程”，我在查阅资料后仍对此持保留态度，来自IBM Haifa Research Labs的Muli Ben-Yehuda这样总结了Linux中进程和线程的差异：</p>
+<h2 id="再看线程和进程的异同"><a href="#再看线程和进程的异同" class="headerlink" title="再看线程和进程的异同"></a>再看线程和进程的异同</h2><p>在美团技术博客中<a href="https://tech.meituan.com/nio.html" target="_blank">Java NIO浅析</a>所述“在Linux这样的操作系统中，线程本质上就是一个进程”，我在查阅资料后仍对此持保留态度，来自IBM Haifa Research Labs的Muli Ben-Yehuda这样总结了Linux中进程和线程的差异：</p>
 <ul>
 <li>进程和线程几乎（almost）相同，它们最主要的差异是<strong>线程共享了虚拟内存地址空间（virtual memory address space）</strong>；</li>
 <li>进程的上下文切换（Context switches）已经很快了，线程甚至更快；</li>
@@ -280,10 +280,8 @@
 </ul>
 <h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ol>
 <li><a href="&quot;www.mulix.org/lectures/kernel_workshop_mar_2004/things.pdf&quot;">10 Things Every Linux Programmer Should Know - Muli Ben-Yehuda</a></li>
-<li><p><a href="&quot;https://elinux.org/images/1/1c/Ben-Yossef-GoodBadUgly.pdf&quot;">On Threads,Processes and Co-Processes - Gilad Ben-Yossef</a></p>
-</li>
-<li><p><a href="&quot;https://www.backblaze.com/blog/whats-the-diff-programs-processes-and-threads/&quot;">What’s the Diff: Programs, Processes, and Threads -  Roderick Baue</a></p>
-</li>
+<li><a href="&quot;https://elinux.org/images/1/1c/Ben-Yossef-GoodBadUgly.pdf&quot;">On Threads,Processes and Co-Processes - Gilad Ben-Yossef</a></li>
+<li><a href="&quot;https://www.backblaze.com/blog/whats-the-diff-programs-processes-and-threads/&quot;">What’s the Diff: Programs, Processes, and Threads -  Roderick Baue</a></li>
 <li><a href="&quot;https://en.wikipedia.org/wiki/Coroutine&quot;">Coroutine - Wikipedia</a></li>
 <li>《深入理解计算机系统》</li>
 </ol>
@@ -295,7 +293,7 @@
     <div class="content">
         
 <span class="post-time">
-    最后更新时间：<time datetime="2018-09-07T07:22:50.720Z" itemprop="dateUpdated">2018-09-07 15:22:50</time>
+    最后更新时间：<time datetime="2018-09-07T07:51:20.778Z" itemprop="dateUpdated">2018-09-07 15:51:20</time>
 </span><br>
 
 
@@ -327,7 +325,7 @@
 <div class="page-share" id="pageShare">
     <ul class="reset share-icons">
       <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://ipopker.com/2018/09/06/Linux下线程、进程和协程/&title=《Linux下线程、进程和协程》 — iPopker's Blog&pic=http://ipopker.com/img/avatar.jpg" data-title="微博">
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://ipopker.com/2018/09/06/Linux下线程、进程和协程/&title=《重新认识Linux下线程、进程和协程》 — iPopker's Blog&pic=http://ipopker.com/img/avatar.jpg" data-title="微博">
           <i class="icon icon-weibo"></i>
         </a>
       </li>
@@ -337,7 +335,7 @@
         </a>
       </li>
       <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://ipopker.com/2018/09/06/Linux下线程、进程和协程/&title=《Linux下线程、进程和协程》 — iPopker's Blog&source=放我去写代码" data-title=" QQ">
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://ipopker.com/2018/09/06/Linux下线程、进程和协程/&title=《重新认识Linux下线程、进程和协程》 — iPopker's Blog&source=放我去写代码" data-title=" QQ">
           <i class="icon icon-qq"></i>
         </a>
       </li>
@@ -347,7 +345,7 @@
         </a>
       </li>
       <li>
-        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Linux下线程、进程和协程》 — iPopker's Blog&url=http://ipopker.com/2018/09/06/Linux下线程、进程和协程/&via=http://ipopker.com" data-title=" Twitter">
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《重新认识Linux下线程、进程和协程》 — iPopker's Blog&url=http://ipopker.com/2018/09/06/Linux下线程、进程和协程/&via=http://ipopker.com" data-title=" Twitter">
           <i class="icon icon-twitter"></i>
         </a>
       </li>
@@ -447,7 +445,7 @@
 <div class="global-share" id="globalShare">
     <ul class="reset share-icons">
       <li>
-        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://ipopker.com/2018/09/06/Linux下线程、进程和协程/&title=《Linux下线程、进程和协程》 — iPopker's Blog&pic=http://ipopker.com/img/avatar.jpg" data-title="微博">
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://ipopker.com/2018/09/06/Linux下线程、进程和协程/&title=《重新认识Linux下线程、进程和协程》 — iPopker's Blog&pic=http://ipopker.com/img/avatar.jpg" data-title="微博">
           <i class="icon icon-weibo"></i>
         </a>
       </li>
@@ -457,7 +455,7 @@
         </a>
       </li>
       <li>
-        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://ipopker.com/2018/09/06/Linux下线程、进程和协程/&title=《Linux下线程、进程和协程》 — iPopker's Blog&source=放我去写代码" data-title=" QQ">
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://ipopker.com/2018/09/06/Linux下线程、进程和协程/&title=《重新认识Linux下线程、进程和协程》 — iPopker's Blog&source=放我去写代码" data-title=" QQ">
           <i class="icon icon-qq"></i>
         </a>
       </li>
@@ -467,7 +465,7 @@
         </a>
       </li>
       <li>
-        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Linux下线程、进程和协程》 — iPopker's Blog&url=http://ipopker.com/2018/09/06/Linux下线程、进程和协程/&via=http://ipopker.com" data-title=" Twitter">
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《重新认识Linux下线程、进程和协程》 — iPopker's Blog&url=http://ipopker.com/2018/09/06/Linux下线程、进程和协程/&via=http://ipopker.com" data-title=" Twitter">
           <i class="icon icon-twitter"></i>
         </a>
       </li>
